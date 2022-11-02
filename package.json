@@ -4,7 +4,9 @@
   "description": "",
   "main": "src/playground.ts",
   "scripts": {
+    "build": "rm -rf dist && node_modules/typescript/bin/tsc -p .",
     "dev": "npx ts-node src/playground.ts",
+    "start": "node dist/playground.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
