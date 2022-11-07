@@ -2,6 +2,13 @@ import express from 'express';
 import { Application, Response, Request } from 'express';
 import { Server } from 'http';
 import { isAliveRoute } from '../Routes/is_alive.route';
+import { shareRoute } from '../Routes/share.route';
+import { DataStore } from "../Datastore/datastore";
+
+type Configuration = {
+    port: number;
+    dataStore: DataStore;
+};
 
 export class ExpressServer {
     
@@ -9,15 +16,17 @@ export class ExpressServer {
     private port: number;
     private server: Server | undefined;
 
-    constructor(port: number) {
+    constructor(configuration: Configuration) {
 
         this.app = express();
         this.app.use(express.json());
         this.app.use(this.errorHandler);
-        this.port = port;
+        this.port = configuration.port;
 
         this.setupLogs();
-        this.loadRouters();
+        
+        const share = shareRoute(configuration.dataStore);
+        this.loadRouters(share);
     }
 
     public listen() {
@@ -26,8 +35,9 @@ export class ExpressServer {
         })
     }
 
-    private loadRouters() {
+    private loadRouters(shareRoute: express.Router) {
         this.app.use(isAliveRoute);
+        this.app.use(shareRoute);
     }
 
     private setupLogs() {

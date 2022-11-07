@@ -4,14 +4,20 @@ import { DataStore } from "./Datastore/datastore";
 import { AppServer } from "./Server/app.server";
 
 function start() {
-    console.log("Hello World!");
+    const configuration = loadConfiguration();
 
-    const server = new AppServer(3001);
-    server.start();
-
-
-    const dataStore = new DataStore();
+    const dataStore = new DataStore(configuration.sequelizeHost);
     dataStore.testConnection();
+    dataStore.loadModels();
+
+    const server = new AppServer(dataStore);
+    server.start();
+}
+
+function loadConfiguration() {
+    return {
+        sequelizeHost: process.env.SEQUELIZE_HOST!
+    };
 }
 
 start();
